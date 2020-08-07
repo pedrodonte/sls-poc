@@ -36,6 +36,7 @@ provider:
   runtime: python3.6
   environment:
     DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
+    DYNAMODB_MENSAJE: MENSAJE-${opt:stage, self:provider.stage}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -46,11 +47,10 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
         - dynamodb:DescribeTable
-      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+      #Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_MENSAJE}"
 
 #cfnRole: arn:aws:iam::222162321971:role/api-control-acceso-dev
-
-
 
 
 functions:
@@ -68,17 +68,31 @@ functions:
           path: agenda
           method: post
           cors: true
-  getid:
-    handler: code/get.get
+  msg_get:
+    handler: code/mensaje_crud.msg_get
     events:
       - http:
-          path: agenda/{paciente_id}
+          path: mensaje/{mensaje_id}
           method: get
           cors: true
           integration: lambda
           request:
             paths:
-              paciente_id: true
+              mensaje_id: true
+  msg_list:
+    handler: code/mensaje_crud.msg_list
+    events:
+      - http:
+          path: mensaje
+          method: get
+          cors: true
+  msg_create:
+    handler: code/mensaje_crud.msg_crear
+    events:
+      - http:
+          path: mensaje
+          method: post
+          cors: true
 
 
           
